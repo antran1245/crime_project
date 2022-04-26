@@ -1,5 +1,5 @@
 // Add all the marker to the map according to the coordinates data
-function addMarker(coordinates) {
+function addMarker() {
     const infoWindow = new google.maps.InfoWindow({
         content: "",
         disableAutoPan: true
@@ -95,7 +95,7 @@ async function fetchUnique(url) {
 }
 
 // Select the filters
-filter = []
+filter = [{type: "incident_year", value: '2022'}]
 async function filterValue(select) {
     url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
     if(select.value != "default") {
@@ -103,7 +103,7 @@ async function filterValue(select) {
             index = filter.findIndex(obj => obj.type == select.name );
             filter[index].value = select.value;
         } else {
-            filter.push({"type": select.name, "value": select.value})
+            filter.push({type: select.name, value: select.value})
         }
     } else {
         filter = filter.filter(option => option.type != select.name )
@@ -124,21 +124,34 @@ async function filterValue(select) {
     }
 }
 
+// Change to the Center or Zoom
 async function changeInPan() {
     url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
     for (let i = 0; i < filter.length; i++) {
         url += ` AND ${filter[i].type}="${filter[i].value}"` 
     }
     coordinates = await fetchWithinRange(url)
-    console.log(coordinates)
     heatID = document.querySelector('#heatmapID > div');
     if(heatID.innerHTML != "Normal Map") {
         deletesMarker()
-        addMarker(coordinates)
-        console.log(markersArr.length)
+        addMarker()
     } else {
         heatmapData = []
         heatmap.setMap(null)
         addHeatMapData()
+    }
+}
+
+// Filter the Dirstrict and move over to the neighborhood
+function filterDistrict(element) {
+    for(let i = 0; i < neighborhoods.length; i++) {
+        if(element.value == neighborhoods[i].neighborhood) {
+            center.lat = neighborhoods[i].lat;
+            center.lng = neighborhoods[i].lng;
+            let latLng = new google.maps.LatLng(center.lat, center.lng);
+            map.panTo(latLng)
+            changeInPan()
+            break;
+        }
     }
 }

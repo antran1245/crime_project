@@ -44,7 +44,7 @@ async function initMap() {
     // Zoom change on the map
     map.addListener("zoom_changed", () => {
         let newZoom = map.getZoom();
-        radius = radius + ((zoom - newZoom)* 400);
+        radius = radius + ((zoom - newZoom)* 500);
         zoom = newZoom;
         changeInPan();
     })
