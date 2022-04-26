@@ -66,17 +66,28 @@ function deletesHeatMap() {
     heatmapData = []
 }
 
+// // Fetch all the coordinates of reported crime
+// urlAll = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL AND incident_year="2022"';
+// async function fetchAllCoordinates(url){
+//     let response = await fetch(url);
+//     let data = response.json()
+//     return data
+// }
+
 // Fetch all the coordinates of reported crime
-urlAll = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL AND incident_year="2022"';
-async function fetchAllCoordinates(url){
+urlRange = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL AND incident_year="2022"';
+async function fetchWithinRange(url){
+    url += ` AND within_circle(point, ${center.lat}, ${center.lng}, ${radius})&$limit=200`;
     let response = await fetch(url);
     let data = response.json()
     return data
 }
 
 // Get all the unique values in the incident_category column
-urlIncident = "https://data.sfgov.org/resource/wg3w-h783.json?$select=incident_category&$group=incident_category";
-urlYear = "https://data.sfgov.org/resource/wg3w-h783.json?$select=incident_year&$group=incident_year";
+urlIncident = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct incident_category";
+urlYear = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct incident_year";
+urlNeighborhood = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct analysis_neighborhood";
+urlPolice = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct police_district";
 async function fetchUnique(url) {
     let response = await fetch(url)
     let data = response.json()
@@ -88,8 +99,8 @@ filter = []
 async function filterValue(select) {
     url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
     if(select.value != "default") {
-        if (filter.filter(option => option.type = select.name ).length>0) {
-            index = filter.findIndex(obj => obj.type == select.name);
+        if (filter.filter(option => option.type == select.name ).length>0) {
+            index = filter.findIndex(obj => obj.type == select.name );
             filter[index].value = select.value;
         } else {
             filter.push({"type": select.name, "value": select.value})
@@ -100,7 +111,8 @@ async function filterValue(select) {
     for (let i = 0; i < filter.length; i++) {
         url += ` AND ${filter[i].type}="${filter[i].value}"` 
     }
-    coordinates = await fetchAllCoordinates(url)
+    // coordinates = await fetchAllCoordinates(url)
+    coordinates = await fetchWithinRange(url)
     heatID = document.querySelector('#heatmapID > div');
     if(heatID.innerHTML != "Normal Map") {
         deletesMarker()
@@ -112,3 +124,21 @@ async function filterValue(select) {
     }
 }
 
+async function changeInPan() {
+    url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
+    for (let i = 0; i < filter.length; i++) {
+        url += ` AND ${filter[i].type}="${filter[i].value}"` 
+    }
+    coordinates = await fetchWithinRange(url)
+    console.log(coordinates)
+    heatID = document.querySelector('#heatmapID > div');
+    if(heatID.innerHTML != "Normal Map") {
+        deletesMarker()
+        addMarker(coordinates)
+        console.log(markersArr.length)
+    } else {
+        heatmapData = []
+        heatmap.setMap(null)
+        addHeatMapData()
+    }
+}

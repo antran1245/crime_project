@@ -19,21 +19,40 @@ function createCheckboxes(data, column_name, id) {
 
 let map;
 let coordinates;
-let markersArr = []
-let mode = []
+let markersArr = [];
+let mode = [];
 let heatmap;
+let radius = 1000;
+let zoom = 16;
 
 // Initialize and add the map
 async function initMap() {
     // The map, centered at SF
     map = await new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
+        zoom: zoom,
         center: sf,
         styles: mode,
+        minZoom: 13,
     });
-    
-    // Markers coordinates
-    coordinates = await fetchAllCoordinates(urlAll);
+    // Change to the center of map
+    map.addListener("dragend", () => {
+        let newCenter = map.getCenter();
+        center.lat = newCenter.lat();
+        center.lng = newCenter.lng();
+        changeInPan();
+    })
+    // Zoom change on the map
+    map.addListener("zoom_changed", () => {
+        let newZoom = map.getZoom();
+        radius = radius + ((zoom - newZoom)* 400);
+        zoom = newZoom;
+        changeInPan();
+    })
+
+
+    // Markers coordinates - initial setup
+    // coordinates = await fetchAllCoordinates(urlAll);
+    coordinates = await fetchWithinRange(urlRange)
     addMarker(coordinates);
 
     // Create Filter Button
@@ -56,6 +75,10 @@ async function initMap() {
     createCheckboxes(uniqueIncident, "incident_category", '#filter-types');
     uniqueYear = await fetchUnique(urlYear);
     createCheckboxes(uniqueYear, "incident_year", '#filter-dates');
+    uniqueNeighborhoods = await fetchUnique(urlNeighborhood);
+    createCheckboxes(uniqueNeighborhoods, "analysis_neighborhood", '#filter-neighborhoods');
+    uniquePolice = await fetchUnique(urlPolice);
+    createCheckboxes(uniquePolice, "police_district", '#filter-police');
 }
 
 window.initMap = initMap;

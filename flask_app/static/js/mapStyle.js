@@ -3,6 +3,10 @@ const sf = {
     lat: 37.7772383807668,
     lng: -122.43293971229544
 };
+const center = {
+    lat: 37.7772383807668,
+    lng: -122.43293971229544
+};
 
 // Night mode style for map
 nightMode = [
