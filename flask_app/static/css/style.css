@@ -55,3 +55,28 @@
 select {
     padding:10px;
 }
+.filter-class {
+    width: 300px;
+    margin: auto;
+}
+.filter-class * {
+    padding: 10px;
+}
+.filter-class input {
+    width: 200px;
+}
+.filter-class button {
+    width: 70px;
+}
+
+/* Markers */
+.info-label {
+    font-weight: bold;
+}
+
+.noSize {
+    resize: none;
+}
+.noSize:focus {
+    outline: none;
+}

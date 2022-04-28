@@ -14,20 +14,25 @@
         <div id="map"></div>
             <div id="filter-modal" style="display:none">
                 <div id="filter-content">
+                    <h3>Search</h3>
+                    <div class="filter-class">
+                        <input id="filter-incident-number" name="incident_number" placeholder="Search">
+                        <button onclick="filterIncident()">Search</button>
+                    </div>
                     <h3>Categories</h3>
-                    <select id="filter-types" onchange="filterValue(this)" name="incident_category">
+                    <select id="filter-types" onchange="filterValue(this)" name="incident_category" class="filter-class">
                     
                     </select>
                     <h3>Year</h3>
-                    <select id="filter-dates" onchange="filterValue(this)" name="incident_year">
+                    <select id="filter-dates" onchange="filterValue(this)" name="incident_year" class="filter-class">
                     
                     </select>
                     <h3>Neighborhoods</h3>
-                    <select id="filter-neighborhoods"onchange="filterDistrict(this)" name="analysis_neighborhood">
+                    <select id="filter-neighborhoods"onchange="filterDistrict(this)" name="analysis_neighborhood" class="filter-class">
                     
                     </select>
                     <h3>Police District</h3>
-                    <select id="filter-police" onchange="filterValue(this)" name="police_district">
+                    <select id="filter-police" onchange="filterValue(this)" name="police_district" class="filter-class">
                 </div>
             </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

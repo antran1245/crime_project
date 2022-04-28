@@ -39,14 +39,20 @@ async function initMap() {
         let newCenter = map.getCenter();
         center.lat = newCenter.lat();
         center.lng = newCenter.lng();
-        changeInPan();
+        if (filter.length < 1) {
+            filter.push({type: "incident_year", value: '2022'})
+        }
+        changeInFilter();
     })
     // Zoom change on the map
     map.addListener("zoom_changed", () => {
         let newZoom = map.getZoom();
         radius = radius + ((zoom - newZoom)* 500);
         zoom = newZoom;
-        changeInPan();
+        if (filter.length < 1) {
+            filter.push({type: "incident_year", value: '2022'})
+        }
+        changeInFilter();
     })
 
 

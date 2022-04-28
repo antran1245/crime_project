@@ -14,8 +14,14 @@ function addMarker() {
         <p><span class="info-label">Time:</span> ${date.toLocaleTimeString('en-US')}</p>
         <p><span class="info-label">Police District:</span> ${data.police_district}</p>
         <p><span class="info-label">Category:</span> ${data.incident_category}</p>
-        <p><span>Description:</span> ${data.incident_description}</p>
+        <p><span class="info-label">Description:</span> ${data.incident_description}</p>
         <p> ${data.resolution} </p>
+        <form id="${data.incident_number}" style="display:none">
+            <label class="info-label" style="display:block"> Comment: </label>
+            <textarea class="noSize" name="message" placeholder="Enter comments" rows="3" cols="40"></textarea>
+        </form>
+            <button type="button" onclick="comment(this, ${data.incident_number})">Add Comment</button>
+            <button type="button" onclick="viewComment(${data.incident_number})">View Comment</button>
         </div>`;
         let location = new google.maps.LatLng(data.latitude, data.longitude)
         const marker = new google.maps.Marker({
@@ -82,7 +88,6 @@ async function fetchWithinRange(url){
     let data = response.json()
     return data
 }
-
 // Get all the unique values in the incident_category column
 urlIncident = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct incident_category";
 urlYear = "https://data.sfgov.org/resource/wg3w-h783.json?$select=distinct incident_year";
@@ -93,39 +98,18 @@ async function fetchUnique(url) {
     let data = response.json()
     return data
 }
-
-// Select the filters
-filter = [{type: "incident_year", value: '2022'}]
-async function filterValue(select) {
-    url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
-    if(select.value != "default") {
-        if (filter.filter(option => option.type == select.name ).length>0) {
-            index = filter.findIndex(obj => obj.type == select.name );
-            filter[index].value = select.value;
-        } else {
-            filter.push({type: select.name, value: select.value})
-        }
-    } else {
-        filter = filter.filter(option => option.type != select.name )
-    }
-    for (let i = 0; i < filter.length; i++) {
-        url += ` AND ${filter[i].type}="${filter[i].value}"` 
-    }
-    // coordinates = await fetchAllCoordinates(url)
-    coordinates = await fetchWithinRange(url)
-    heatID = document.querySelector('#heatmapID > div');
-    if(heatID.innerHTML != "Normal Map") {
-        deletesMarker()
-        addMarker(coordinates)
-    } else {
-        heatmapData = []
-        heatmap.setMap(null)
-        addHeatMapData()
-    }
+// Fetch a certain report by incident number
+async function fetchIncident(id) {
+    url = `https://data.sfgov.org/resource/wg3w-h783.json?incident_number=${id}&$where=latitude IS NOT NULL AND longitude IS NOT NULL`;
+    let response = await fetch(url);
+    let data = response.json()
+    console.log(data)
+    return data
 }
 
 // Change to the Center or Zoom
-async function changeInPan() {
+filter = [{type: "incident_year", value: '2022'}]
+async function changeInFilter() {
     url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
     for (let i = 0; i < filter.length; i++) {
         url += ` AND ${filter[i].type}="${filter[i].value}"` 
@@ -141,7 +125,21 @@ async function changeInPan() {
         addHeatMapData()
     }
 }
-
+// Select the filters
+function filterValue(select) {
+    url = 'https://data.sfgov.org/resource/wg3w-h783.json?$where=latitude IS NOT NULL AND longitude IS NOT NULL'
+    if(select.value != "default") {
+        if (filter.filter(option => option.type == select.name ).length>0) {
+            index = filter.findIndex(obj => obj.type == select.name );
+            filter[index].value = select.value;
+        } else {
+            filter.push({type: select.name, value: select.value})
+        }
+    } else {
+        filter = filter.filter(option => option.type != select.name )
+    }
+    changeInFilter();
+}
 // Filter the Dirstrict and move over to the neighborhood
 function filterDistrict(element) {
     for(let i = 0; i < neighborhoods.length; i++) {
@@ -150,8 +148,52 @@ function filterDistrict(element) {
             center.lng = neighborhoods[i].lng;
             let latLng = new google.maps.LatLng(center.lat, center.lng);
             map.panTo(latLng)
-            changeInPan()
+            changeInFilter();
             break;
         }
     }
+}
+// Filter the incident number
+async function filterIncident() {
+    number = document.getElementById('filter-incident-number');
+    coordinates = await fetchIncident(number.value)
+    center.lat = coordinates[0].latitude
+    center.lng = coordinates[0].longitude
+    let latLng = new google.maps.LatLng(center.lat, center.lng);
+    map.panTo(latLng)
+    heatID = document.querySelector('#heatmapID > div');
+    if(heatID.innerHTML != "Normal Map") {
+        deletesMarker()
+        addMarker()
+    } else {
+        heatmapData = []
+        heatmap.setMap(null)
+        addHeatMapData()
+    }
+}
+
+// Comment
+function comment(element, id) {
+    let form = document.getElementById(id);
+    if(element.type == "button") {
+        form.style.display = "block";
+        element.type = 'submit';
+        form.addEventListener("submit", (event) => addComment(event, form, id));
+    } else if (element.type == 'submit') {
+        element.setAttribute("form", (id));
+    }
+}
+// Add comment into the database
+function addComment(e, formData, id) {
+    e.preventDefault();
+    let data = new FormData(formData)
+    fetch(`http://localhost:5000/process/comments/${id}`, {method:"POST", body: data})
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(err => console.log(err))
+    formData.reset();
+}
+
+function viewComment() {
+    
 }
