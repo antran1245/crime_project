@@ -22,6 +22,7 @@ function addMarker() {
         </form>
             <button type="button" onclick="comment(this, ${data.incident_number})">Add Comment</button>
             <button type="button" onclick="viewComment(${data.incident_number})">View Comment</button>
+        <div id="comments${data.incident_number}" style="display:none"></div>
         </div>`;
         let location = new google.maps.LatLng(data.latitude, data.longitude)
         const marker = new google.maps.Marker({
@@ -184,16 +185,26 @@ function comment(element, id) {
     }
 }
 // Add comment into the database
-function addComment(e, formData, id) {
+async function addComment(e, formData, id) {
     e.preventDefault();
     let data = new FormData(formData)
-    fetch(`http://localhost:5000/process/comments/${id}`, {method:"POST", body: data})
+    await fetch(`http://localhost:5000/process/comments/${id}`, {method:"POST", body: data})
     .then(response => response.json())
     .then(data => console.log(data))
     .catch(err => console.log(err))
     formData.reset();
+    await viewComment(id)
 }
 
-function viewComment() {
-    
+async function viewComment(id) {
+    let response = await fetch(`http://localhost:5000/process/comments/view/${id}`)
+    let data = await response.json()
+
+    commentDiv = document.getElementById(`comments${id}`)
+    output = ""
+    for (let i = 0; i < data.length; i++) {
+        output += `<p class="comment">${data[i].content}</p>`
+    }
+    commentDiv.style.display = 'block'
+    commentDiv.innerHTML = output
 }

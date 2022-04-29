@@ -48,6 +48,8 @@
     border-radius: 10px;
     text-align: center;
 }
+
+/* Filter select, input, text */
 #filter-content h3 {
     margin: 5px 0;
     text-align: center;
@@ -73,10 +75,26 @@ select {
 .info-label {
     font-weight: bold;
 }
-
 .noSize {
     resize: none;
 }
 .noSize:focus {
     outline: none;
+}
+
+/* Info Window */
+.gm-style-iw {
+    padding: 20px !important;
+}
+.gm-ui-hover-effect {
+    top: 0 !important;
+    right: 0 !important;
+}
+
+
+/* Comment */
+.comment {
+    border: 1px solid black;
+    padding: 2px;
+    margin: 2px 0;
 }

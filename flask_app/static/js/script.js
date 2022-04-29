@@ -47,7 +47,7 @@ async function initMap() {
     // Zoom change on the map
     map.addListener("zoom_changed", () => {
         let newZoom = map.getZoom();
-        radius = radius + ((zoom - newZoom)* 500);
+        radius = Math.abs(radius + ((zoom - newZoom)* 500));
         zoom = newZoom;
         if (filter.length < 1) {
             filter.push({type: "incident_year", value: '2022'})

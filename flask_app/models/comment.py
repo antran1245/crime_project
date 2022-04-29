@@ -10,19 +10,12 @@ class Comment:
         self.updated_at = data['updated_at']
         
     @classmethod
-    def get_all(cls):
-        query = "SELECT * FROM comments"
-        
-        result = connectToMySQL(DATABASE).query_db(query)
-        
-        tables = []
-        for table in result:
-            tables.append(cls(table))
-        return tables
+    def get_all_from_incident_number(cls, data):
+        query = "SELECT content, comments.created_at, comments.updated_at FROM comments LEFT JOIN reports ON report_id = reports.id WHERE reports.incident_number = %(incident_number)s ORDER BY created_at"
+        result = connectToMySQL(DATABASE).query_db(query, data)
+        return result
     
     @classmethod
     def insert(cls, data):
         query = "INSERT INTO comments (content, report_id) VALUES (%(content)s,%(report_id)s);"
         return connectToMySQL(DATABASE).query_db(query, data)
-    
-    

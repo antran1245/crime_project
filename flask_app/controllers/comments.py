@@ -4,7 +4,6 @@ from flask_app.models import report, comment
 
 @app.route('/process/comments/<int:id>', methods=["POST"])
 def addComment(id):
-    print(request.form)
     # check if inciden_number is in reports table
     result = report.Report.report_number_exist({"incident_number": id})
     report_id = 0
@@ -18,3 +17,8 @@ def addComment(id):
     }
     comment.Comment.insert(data)
     return jsonify(message="Add a comment")
+
+@app.route('/process/comments/view/<int:id>')
+def viewComment(id):
+    data = comment.Comment.get_all_from_incident_number({"incident_number": id})
+    return jsonify(data)
