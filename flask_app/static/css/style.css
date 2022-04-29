@@ -77,6 +77,7 @@ select {
 }
 .noSize {
     resize: none;
+    width: inherit;
 }
 .noSize:focus {
     outline: none;
@@ -90,11 +91,18 @@ select {
     top: 0 !important;
     right: 0 !important;
 }
-
+.info-box button {
+    padding: 5px;
+    background-color: dodgerblue;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    margin-top: 5px;
+}
 
 /* Comment */
 .comment {
     border: 1px solid black;
-    padding: 2px;
+    padding: 5px;
     margin: 2px 0;
 }

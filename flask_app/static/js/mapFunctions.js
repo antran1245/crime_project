@@ -8,7 +8,7 @@ function addMarker() {
     // Creating of Markers
     const markers = coordinates.map((data) => {
         date = new Date(data.incident_datetime)
-        const label = `<div>
+        const label = `<div class="info-box">
         <p><span class="info-label">Incident Number:</span> ${data.incident_number}</p>
         <p><span class="info-label">Date:</span> ${date.toLocaleDateString()}</p>
         <p><span class="info-label">Time:</span> ${date.toLocaleTimeString('en-US')}</p>
@@ -21,7 +21,7 @@ function addMarker() {
             <textarea class="noSize" name="message" placeholder="Enter comments" rows="3" cols="40"></textarea>
         </form>
             <button type="button" onclick="comment(this, ${data.incident_number})">Add Comment</button>
-            <button type="button" onclick="viewComment(${data.incident_number})">View Comment</button>
+            <button type="button" onclick="viewComment(${data.incident_number})">View Comments</button>
         <div id="comments${data.incident_number}" style="display:none"></div>
         </div>`;
         let location = new google.maps.LatLng(data.latitude, data.longitude)
@@ -196,14 +196,25 @@ async function addComment(e, formData, id) {
     await viewComment(id)
 }
 
+let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 async function viewComment(id) {
     let response = await fetch(`http://localhost:5000/process/comments/view/${id}`)
     let data = await response.json()
 
     commentDiv = document.getElementById(`comments${id}`)
     output = ""
-    for (let i = 0; i < data.length; i++) {
-        output += `<p class="comment">${data[i].content}</p>`
+    let i = 0;
+    if(data.length > 5) {
+        i = data.length - 5;
+    }
+    for (i = 0; i < data.length; i++) {
+        let date = new Date(data[i].created_at).toDateString()
+        let time = new Date(data[i].created_at).toLocaleTimeString()
+
+        output += `<div class="comment">
+        <p>${data[i].content}</p>
+        <p style="text-align:end">${date} ${time}</p>
+        </div>`
     }
     commentDiv.style.display = 'block'
     commentDiv.innerHTML = output

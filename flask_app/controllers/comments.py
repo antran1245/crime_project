@@ -15,7 +15,8 @@ def addComment(id):
         "content": request.form['message'],
         "report_id": report_id
     }
-    comment.Comment.insert(data)
+    if request.form['message'] != "":
+        comment.Comment.insert(data)
     return jsonify(message="Add a comment")
 
 @app.route('/process/comments/view/<int:id>')
