@@ -11,7 +11,7 @@ class Comment:
         
     @classmethod
     def get_all_from_incident_number(cls, data):
-        query = "SELECT content, comments.created_at, comments.updated_at FROM comments LEFT JOIN reports ON report_id = reports.id WHERE reports.incident_number = %(incident_number)s ORDER BY created_at"
+        query = "SELECT content, comments.created_at, comments.updated_at FROM comments LEFT JOIN reports ON report_id = reports.id WHERE reports.incident_number = %(incident_number)s ORDER BY created_at DESC LIMIT 5"
         result = connectToMySQL(DATABASE).query_db(query, data)
         return result
     

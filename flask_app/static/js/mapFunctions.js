@@ -203,11 +203,7 @@ async function viewComment(id) {
 
     commentDiv = document.getElementById(`comments${id}`)
     output = ""
-    let i = 0;
-    if(data.length > 5) {
-        i = data.length - 5;
-    }
-    for (i = 0; i < data.length; i++) {
+    for (let i = data.length-1; i >= 0; i--) {
         let date = new Date(data[i].created_at).toDateString()
         let time = new Date(data[i].created_at).toLocaleTimeString()
 
