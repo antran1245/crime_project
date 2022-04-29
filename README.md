@@ -10,6 +10,8 @@
 - Comment on selected crime report
 - View Comments
 
+![](Screenshot.png)
+
 **Coding Languages and Usages**
 
 Python
@@ -27,3 +29,14 @@ HTML and CSS
 **Database**
 
 MySQL
+
+**Features**
+- Filter by:
+    - incident number
+    - neighborhood
+    - year
+    - category
+    - police district
+- Dark mode map
+- Heat map
+- Pan and zoom will refresh a set of report 1000 meter from center of map
