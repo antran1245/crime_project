@@ -28,7 +28,7 @@ HTML and CSS
 
 **Database**
 
-MySQL
+- MySQL
 
 **Features**
 - Filter by:
@@ -40,3 +40,7 @@ MySQL
 - Dark mode map
 - Heat map
 - Pan and zoom will refresh a set of report 1000 meter from center of map
+
+**Requirement**
+Need a JavaScript Google Map API key inside an .env file called GOOGLE_MAP_API
+Will become an variable called api inside /flask_app/controllers/map.py
